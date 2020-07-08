@@ -1,0 +1,77 @@
+resources:
+  - name: vijay_github
+    type: GitRepo
+    configuration:
+      gitProvider: vijay
+      path: vijayreddy1991/windows          
+      
+pipelines:
+  - name: vijay_pipelines
+    steps:
+      - name: base_vijay
+        type: PowerShell
+        configuration: 
+          nodePool: win_2019  
+          integrations:
+            - name: vijay_docker
+          inputResources:
+            - name: vijay_github
+         
+        execution:
+          onExecute:
+            - Push-Location $res_vijay_github_resourcePath
+#             - docker rmi -f vijayreddy1991/drydockwindows19base:master
+            - pwd
+            - docker build -t drydockwindows19base:master .
+            - docker images
+#             - docker push vijayreddy1991/drydockwindows19base:master
+
+          onSuccess:
+            - echo "Job well done!"   
+    
+        
+      - name: vijay_test
+        type: PowerShell
+        configuration:
+          nodePool: win_2019  
+#           runtime: # optional            
+#             type: host
+#             image:            
+#               custom:
+#                 name: drydockwindows19base
+#                 tag: master         
+          integrations:
+            - name: vijay
+            - name: vijay_docker
+          inputResources:
+            - name: vijay_github
+          inputSteps:
+            - name: base_vijay
+            
+        execution:
+          onExecute: 
+            - docker images
+            - Push-Location $res_vijay_github_resourcePath
+            - get-childitem $res_vijay_github_resourcePath 
+            - docker run -i drydockwindows19base:master
+            - git --version
+            - python --version
+            - node --version
+            - git lfs version
+            - ruby --version
+            - gcloud version
+            - aws --version
+            - eb --version
+            - virtualenv --version
+            - pip show 
+            - az --version
+            - jfrog --version
+            - terraform -version
+            - packer --version
+            - jq --version
+            - kubectl version --client
+            - helm version --client
+            - choco list
+            - choco --version
+            
+            
